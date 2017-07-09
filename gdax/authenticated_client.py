@@ -108,7 +108,7 @@ class AuthenticatedClient(PublicClient):
         return result
 
     def paginate_orders(self, result, after):
-        r = requests.get(self.url + '/orders'), params={'after': after}, auth=self.auth)
+        r = requests.get(self.url + '/orders', params={'after': after}, auth=self.auth)
         # r.raise_for_status()
         if r.json():
             result.append(r.json())
