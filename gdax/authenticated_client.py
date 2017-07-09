@@ -37,7 +37,7 @@ class AuthenticatedClient(PublicClient):
         return result
 
     def history_pagination(self, account_id, result, after):
-        r = requests.get(self.url + '/accounts/{}/ledger?after={}'.format(account_id, str(after)), auth=self.auth)
+        r = requests.get(self.url + '/accounts/{}/ledger'.format(account_id), params={'after': after}, auth=self.auth)
         # r.raise_for_status()
         if r.json():
             result.append(r.json())
@@ -55,7 +55,7 @@ class AuthenticatedClient(PublicClient):
         return result
 
     def holds_pagination(self, account_id, result, after):
-        r = requests.get(self.url + '/accounts/{}/holds?after={}'.format(account_id, str(after)), auth=self.auth)
+        r = requests.get(self.url + '/accounts/{}/holds'.format(account_id), params={'after': after}, auth=self.auth)
         # r.raise_for_status()
         if r.json():
             result.append(r.json())
@@ -108,7 +108,7 @@ class AuthenticatedClient(PublicClient):
         return result
 
     def paginate_orders(self, result, after):
-        r = requests.get(self.url + '/orders?after={}'.format(str(after)), auth=self.auth)
+        r = requests.get(self.url + '/orders'), params={'after': after}, auth=self.auth)
         # r.raise_for_status()
         if r.json():
             result.append(r.json())
@@ -118,18 +118,18 @@ class AuthenticatedClient(PublicClient):
 
     def get_fills(self, order_id='', product_id='', before='', after='', limit=''):
         result = []
-        url = self.url + '/fills?'
+        params = {}
         if order_id:
-            url += "order_id={}&".format(str(order_id))
+            params['order_id'] = order_id
         if product_id:
-            url += "product_id={}&".format(product_id or self.product_id)
+            params['product_id'] = product_id or self.product_id
         if before:
-            url += "before={}&".format(str(before))
+            params['before'] = before
         if after:
-            url += "after={}&".format(str(after))
+            params['after'] = after
         if limit:
-            url += "limit={}&".format(str(limit))
-        r = requests.get(url, auth=self.auth)
+            params['limit'] = limit
+        r = requests.get(self.url + '/fills', params=params, auth=self.auth)
         # r.raise_for_status()
         result.append(r.json())
         if 'cb-after' in r.headers and limit is not len(r.json()):
@@ -137,12 +137,12 @@ class AuthenticatedClient(PublicClient):
         return result
 
     def paginate_fills(self, result, after, order_id='', product_id=''):
-        url = self.url + '/fills?after={}&'.format(str(after))
+        params = {'after': after}
         if order_id:
-            url += "order_id={}&".format(str(order_id))
+            params['order_id'] = order_id
         if product_id:
-            url += "product_id={}&".format(product_id or self.product_id)
-        r = requests.get(url, auth=self.auth)
+            params['product_id'] = product_id or self.product_id
+        r = requests.get(self.url + '/fills', params=params, auth=self.auth)
         # r.raise_for_status()
         if r.json():
             result.append(r.json())
@@ -153,12 +153,12 @@ class AuthenticatedClient(PublicClient):
     def get_fundings(self, result='', status='', after=''):
         if not result:
             result = []
-        url = self.url + '/funding?'
+        params = {}
         if status:
-            url += "status={}&".format(str(status))
+            params['status'] = status
         if after:
-            url += 'after={}&'.format(str(after))
-        r = requests.get(url, auth=self.auth)
+            params['after'] = after
+        r = requests.get(self.url + '/funding', params=params, auth=self.auth)
         # r.raise_for_status()
         result.append(r.json())
         if 'cb-after' in r.headers:
